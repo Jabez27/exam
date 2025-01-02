@@ -1,0 +1,169 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /sg-user-service
+spring.application.name: sg-user-service
+
+mybatis:
+  type-aliases-package: com.github.tangyi.api.user.model,com.github.tangyi.api.exam.model,com.github.tangyi.api.operation.model
+  mapper-locations: classpath*:mappers/*.xml,classpath*:mappers/**/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+mapper:
+  mappers: tk.mybatis.mapper.common.Mapper
+  identity: MYSQL
+  style: camelhumpAndUppercase
+  before: true
+  not-empty: false
+  safe-delete: true
+  safe-update: true
+  check-example-entity-class: true
+
+pagehelper:
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui: /swagger-ui.html
+  packages-to-scan: com.github.tangyi.user.controller,com.github.tangyi.exam.controller
+
+# 七牛云存储配置
+qiniu:
+  access-key: ${QINIU_ACCEESS_KEY:xxxxx}
+  secret-key: ${QINIU_SECRET_KEY:xxxxx}
+  bucket: ${QINIU_BUCKET:sg-exam}
+  domain-of-bucket: ${QINIU_DOMAIN:www.sg-exam.com}
+  expire: 3600  # 链接超时时间，单位秒，默认一小时
+
+# minio 存储配置
+minio:
+  enabled: true
+  endpoint: ${MINIO_ENDPOINT:http://127.0.0.1:9000}
+  bucket: ${MINIO_BUCKET:yunmianshi}
+  access-key: ${MINIO_ACCESS_KEY:zWXHMYJl99MGISbaVanX}
+  secret-key: ${MINIO_SECRET_KEY:kPDoBRlxpIwMEHje1ve5l6e3TGSGUfwE1ONSzRb4}
+  access-domain: ${MINIO_ACCESS_DOMAIN:}
+  chunk-size-mb: ${MINIO_CHUNK_SIZE_MB:10}
+
+sms:
+  appKey: ${SMS_APP_KEY:test}
+  appSecret: ${SMS_APP_SECRET:test}
+  signName: ${SMS_SIGN_NAME:test}
+  templateCode: ${SMS_TEMP_CODE:SMS_171192294}
+
+wx:
+  appId: ${WX_APP_ID:test}
+  appSecret: ${WX_APP_SECRET:test}
+  grantType: ${WX_GRANT_TYPE:authorization_code}
+
+wxh5:
+  appId: ${WXH5_APP_ID:test}
+  appSecret: ${WXH5_APP_SECRET:test}
+  token: 123456
+
+sys:
+  cacheExpire: 86400 # 缓存失效时间，单位秒，默认一天
+  loadConfigs:
+    - sys_web_name
+    - sys_web_main_title
+    - sys_web_sub_title_one
+    - sys_web_sub_title_two
+    - sys_web_copyright
+    - sys_web_show_banner
+    - sys_avatar
+    - sys_admin_main_title
+    - sys_admin_sub_title
+    - sys_wxapp_avatar
+    - sys_wxapp_main_title
+    - sys_wxapp_sub_title
+    - sys_login_show_tenant_code
+    - sys_file_preview_url
+
+gen:
+  author: tangyi
+  # 默认生成包路径 system 需改成自己的模块名称 如 system monitor tool
+  packageName: com.github.tangyi.exam
+  # 生成文件路径
+  genDir: /Users/tangyi/generate
+  # 自动去除表前缀，默认是 false
+  autoRemovePre: true
+  # 表前缀（生成类名不会包含表前缀，多个用逗号分隔）
+  tablePrefix:
+exam:
+  image:
+    CourseImageUrl: ${EXAM_COURSE_IMAGE_URL:https://gitee.com/wells2333/sg-exam/raw/master/docs/images/default_bg1.png}
+    ExaminationImageUrl: ${EXAM_EXAMINATION_IMAGE_URL:https://gitee.com/wells2333/sg-exam/raw/master/docs/images/default_bg1.png}
+
+---
+server:
+  port: ${SERVER_PORT:8080}
+spring:
+  profiles: dev
+  datasource:
+    url: jdbc:mysql://${SG_DB_USER_HOST:localhost}:${SG_DB_USER_POST:3306}/${SG_DB_USER_NAME:sg-exam-user}?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false&allowPublicKeyRetrieval=true
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${SG_DB_USER_USERNAME:sg}
+    password: ${SG_DB_USER_PASSWORD:123456}
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 15
+      auto-commit: true
+      idle-timeout: 30000
+      max-lifetime: 500000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
+  redis:
+    host: ${SG_REDIS_USER_HOST:127.0.0.1}
+    username: ${SG_REDIS_USER_USERNAME:}
+    password: ${SG_REDIS_USER_PASSWORD:}
+    port: ${SG_REDIS_USER_POST:6379}
+
+---
+server:
+  port: ${SERVER_PORT:8080}
+  ssl:
+    enabled: ${SG_SSL_ENABLED:false}  # 默认为 false
+    key-store: ${SG_SSL_STORE}  #类路径下的自签证书
+    key-alias: ${SG_SSL_ALIAS} # 证书别名
+    key-store-password: ${SG_SSL_PASSWORD} #证书密码
+    key-store-type: ${SG_SSL_TYPE:JKS} # 证书类型
+
+spring:
+  profiles: docker
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 100MB
+  datasource:
+    url: jdbc:mysql://${SG_DB_USER_HOST}:${SG_DB_USER_POST}/sg-exam-user?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false&allowPublicKeyRetrieval=true
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${SG_DB_USER_USERNAME:root}
+    password: ${SG_DB_USER_PASSWORD:123456}
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 15
+      auto-commit: true
+      idle-timeout: 30000
+      max-lifetime: 500000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
+  redis:
+    host: ${SG_REDIS_USER_HOST:127.0.0.1}
+    username: ${SG_REDIS_USER_USERNAME:}
+    password: ${SG_REDIS_USER_PASSWORD:}
+    port: ${SG_REDIS_USER_POST:6379}
+
+# 生产环境关闭接口文档
+springdoc:
+  api-docs:
+    enabled: false
+
+# 系统配置
+sys:
+  imageUrl: https://cdn.yunmianshi.com/images/default/%s.jpeg

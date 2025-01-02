@@ -1,0 +1,7 @@
+package ${packageName}.constants;
+
+public interface ${ClassName}CacheName {
+
+	String ${businessNameUpper} = "${businessName}";
+
+}

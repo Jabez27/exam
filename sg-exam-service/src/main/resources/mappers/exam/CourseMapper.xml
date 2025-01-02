@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.tangyi.exam.mapper.CourseMapper">
+    <resultMap id="courseResultMap" type="com.github.tangyi.api.exam.model.Course">
+        <id column="id" property="id"/>
+        <result column="course_name" property="courseName"/>
+        <result column="college" property="college"/>
+        <result column="major" property="major"/>
+        <result column="teacher" property="teacher"/>
+        <result column="course_description" property="courseDescription"/>
+        <result column="image_id" property="imageId"/>
+        <result column="charge_type" property="chargeType"/>
+        <result column="charge_price" property="chargePrice"/>
+        <result column="level" property="level"/>
+        <result column="simple_desc" property="simpleDesc"/>
+        <result column="sort" property="sort"/>
+        <result column="course_status" property="courseStatus"/>
+        <result column="attach_id" property="attachId"/>
+        <result column="access_type" property="accessType"/>
+        <result column="creator" property="creator"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="operator" property="operator"/>
+        <result column="is_deleted" jdbcType="BIT" property="isDeleted"/>
+        <result column="tenant_code" property="tenantCode"/>
+    </resultMap>
+
+    <select id="findPage" resultMap="courseResultMap">
+        SELECT * FROM exam_course WHERE is_deleted = 0
+        <if test="params != null">
+            <if test="params.tenantCode != null and params.tenantCode != ''">
+                AND tenant_code = #{params.tenantCode}
+            </if>
+            <if test="params.accessType != null">
+                AND access_type = #{params.accessType}
+            </if>
+            <if test="params.courseName != null and params.courseName != ''">
+                AND (course_name like CONCAT('%',#{params.courseName},'%'))
+            </if>
+        </if>
+        ORDER BY sort ASC
+    </select>
+
+    <select id="findUserCourses" resultMap="courseResultMap">
+        SELECT *
+        FROM exam_course a
+        WHERE a.is_deleted = 0 AND a.course_status = 1 AND a.tenant_code = #{params.tenantCode}
+        <if test="params.courseName != null and params.courseName != ''">
+            AND (a.course_name LIKE CONCAT('%',#{params.courseName},'%'))
+        </if>
+        AND (
+        a.access_type = 0
+        <if test="params.userId != null">
+            OR (a.access_type = 1 AND a.id IN (SELECT exam_id
+            FROM exam_examination_member
+            WHERE exam_type = 0
+            AND member_type = 1
+            AND member_id = #{params.userId}))
+        </if>
+        <if test="params.deptId != null">
+            OR (a.access_type = 2 AND a.id IN (SELECT exam_id
+            FROM exam_examination_member
+            WHERE exam_type = 0 AND member_type = 2 AND member_id = #{params.deptId}))
+        </if>
+        )
+        <choose>
+            <when test="params.sortField != null">
+                ORDER BY #{params.sortField} DESC
+            </when>
+            <when test="params.sortField == null">
+                ORDER BY sort DESC
+            </when>
+        </choose>
+    </select>
+
+    <select id="findAllCourseCount" resultType="java.lang.Long">
+        SELECT COUNT(1) FROM exam_course a WHERE a.is_deleted = 0
+    </select>
+
+    <select id="findIdsOrderByIdAsc" resultType="java.lang.Long">
+        SELECT a.id FROM exam_course a WHERE a.id >= #{minId} AND a.is_deleted = 0 ORDER BY a.id ASC LIMIT #{pageSize}
+    </select>
+
+    <select id="findList" resultMap="courseResultMap">
+        SELECT * FROM exam_course a WHERE a.is_deleted = 0 AND a.tenant_code = #{tenantCode} ORDER BY sort ASC
+    </select>
+
+    <select id="findListById" resultMap="courseResultMap">
+        SELECT * FROM exam_course a WHERE a.id IN
+        <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <delete id="delete">
+        UPDATE exam_course SET is_deleted = 1 WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteAll">
+        UPDATE exam_course SET is_deleted = 1 WHERE id IN
+        <foreach item="item" index="index" collection="ids" open="("
+                 separator="," close=")">#{item}
+        </foreach>
+    </delete>
+</mapper>

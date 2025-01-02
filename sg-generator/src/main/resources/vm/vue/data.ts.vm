@@ -1,0 +1,29 @@
+import { BasicColumn } from '/@/components/Table';
+import { FormSchema } from '/@/components/Table';
+
+export const columns: BasicColumn[] = [
+  {
+    title: '课程名称',
+    dataIndex: '${className}',
+    width: 160,
+    align: 'left',
+  }
+];
+
+export const searchFormSchema: FormSchema[] = [
+  {
+    field: '${className}',
+    label: '课程名称',
+    component: 'Input',
+    colProps: { span: 8 },
+  }
+];
+
+export const formSchema: FormSchema[] = [
+  {
+    field: '${className}',
+    label: '课程名称',
+    component: 'Input',
+    required: true,
+  }
+];

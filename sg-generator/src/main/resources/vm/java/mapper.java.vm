@@ -1,0 +1,9 @@
+package ${packageName}.mapper;
+
+import com.github.tangyi.api.${moduleName}.model.${ClassName};
+import com.github.tangyi.common.base.CrudMapper;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface ${ClassName}Mapper extends CrudMapper<${ClassName}> {
+}

@@ -1,0 +1,102 @@
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  servlet:
+    multipart:
+      # 单个文件的最大大小
+      max-file-size: 1024MB
+      # 整个请求的最大大小
+      max-request-size: 1024MB
+  jackson:
+    default-property-inclusion: NON_NULL
+    time-zone: ${user.timezone:GMT+8}
+    date-format: yyyy-MM-dd HH:mm:ss
+
+mybatis:
+  type-aliases-package: com.github.tangyi.api
+  configuration:
+    map-underscore-to-camel-case: true
+  mapper-locations: classpath*:mappers/**/*.xml
+
+pagehelper:
+  helperDialect: mysql
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql
+
+sys:
+  key: '1234567887654321'
+  qrCodeUrl: 'http://192.168.1.13:8080/#/mobile'
+
+management:
+  endpoint:
+    health:
+      show-details: "ALWAYS"
+  endpoints:
+    web:
+      exposure:
+        include: "prometheus"
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+
+ignore:
+  urls:
+    - /
+    - /**/*.css
+    - /**/*.js
+    - /**/error
+    - /**/favicon.ico
+    - /**/*swagger*/**
+    - /**/*api-docs*/**
+    - /**/v3/**
+    - /**/csrf
+    - /**/health
+    - /**/metrics/**
+    - /**/loggers/**
+    - /**/actuator/**
+    - /**/*anonymousUser*/**
+    - /**/v1/user/checkExist/**
+    - /**/v1/user/updatePassword
+    - /**/v1/code/**
+    - /**/v1/token/logout
+    - /**/**authentication/**
+    - /**/wx/getTicket
+    - /**/wx/checkSign
+    - /**/wx/getQrCode
+    - /**/wx/getOpenId
+    - /**/**/currentTime
+    - /**/**/login
+    - /**/token/validToken
+    - /**/token/refreshToken
+    - /**/h2/**
+    - /**/v1/sms/**
+    - /**/v1/mobile/sendSms/**
+    - /tool/**
+    - /v1/subjects/template/**
+    - /v1/subjects/exportDemoExcel
+    - /tool/gen/download/**
+    - /v1/config/getDefaultSysConfig
+    - /v1/course/popularCourses
+    - /v1/home/**
+    - /v1/search/**
+
+logging:
+  level:
+    root: INFO
+    com.github.tangyi: DEBUG
+
+---
+spring.profiles: docker
+logging.level.root: INFO
+logging.level.com.github.tangyi: INFO
+
+management.server.port: 4004
+management.endpoint.health.show-details: "ALWAYS"
+management.endpoints.web.exposure.include: "prometheus"
+management.metrics.export.prometheus.enabled: true
+management.metrics.tags.application: ${spring.application.name}
